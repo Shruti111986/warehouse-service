@@ -33,16 +33,16 @@ public class ProductService {
     }
 
     private ProductResponse getAvailableProductQuantity(Product product) {
-        Long quanityAvailableProduct = Long.MAX_VALUE;
+        Long quantityAvailableProduct = Long.MAX_VALUE;
         for (ProductArticle productArticle : product.getProductArticles()) {
             if (productArticle.getArticle().getStock() >= productArticle.getAmountOf()) {
                 Long quantityAvailableArticle = productArticle.getArticle().getStock() / productArticle.getAmountOf();
-                if (quantityAvailableArticle < quanityAvailableProduct)
-                    quanityAvailableProduct = quantityAvailableArticle;
+                if (quantityAvailableArticle < quantityAvailableProduct)
+                    quantityAvailableProduct = quantityAvailableArticle;
             } else
                 break;
         }
-        return new ProductResponse(product.getName(), quanityAvailableProduct);
+        return new ProductResponse(product.getName(), quantityAvailableProduct);
     }
 
     public void save(List<Product> products) {
@@ -56,7 +56,7 @@ public class ProductService {
         ProductResponse productResponse = getAvailableProductQuantity(product);
         if (productResponse.getQuantity() >= quantity) {
             for (ProductArticle productArticle : product.getProductArticles()) {
-                productArticle.getArticle().setStock(productArticle.getArticle().getStock() - productArticle.getAmountOf());
+                productArticle.getArticle().setStock(productArticle.getArticle().getStock() - quantity * productArticle.getAmountOf());
                 inventoryService.save(productArticle.getArticle());
             }
             productResponse.setQuantity(productResponse.getQuantity() - quantity);
